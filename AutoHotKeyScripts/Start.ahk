@@ -47,6 +47,11 @@ CapsLockX_Up(){
     CapsLockPressTimestamp := 0
 }
 
+
+
+
+
+
 global SpaceMode := 0
 global Space_PreKey := ""
 
@@ -77,5 +82,94 @@ Space_Up(){
     ;showToolTip("0")
 }
 
+
+
+
+
+
+#UseHook
+global LShift_PreKey := ""
+global LShiftPressTimestamp := 0
+
+#If LShift_Avaliable()
+#If !LShift_Avaliable()
+#If
+
+Hotkey, If, LShift_Avaliable()
+Hotkey LShift, LShift_Dn
+
+Hotkey, If, !LShift_Avaliable()
+
+Hotkey, If
+Hotkey LShift Up, LShift_Up
+
+LShift_Avaliable(){
+    return 1
+}
+LShift_Dn(){
+    LShift_PreKey := RegExReplace(A_ThisHotkey, "[\$\*\!\^\+\#\s]")
+    ; 记录 CapsLock 按住的时间
+    if ( LShiftPressTimestamp == 0){
+        LShiftPressTimestamp := A_TickCount
+        ;Send, {LShift Down}
+    }
+    ;showToolTip(LShiftPressTimestamp)
+}
+LShift_Up(){
+    if(A_PriorKey == LShift_PreKey){
+        span := A_TickCount - LShiftPressTimestamp
+        
+        if (LShift_PreKey == "LShift" &&  span < 500){
+            switchime(0)
+        }
+    }
+    LShiftPressTimestamp := 0
+    Send, {LShift Up}
+}
+
+
+
+
+
+/*
+~LShift::
+	switchime(0)
+return
+*/
+
+~RShift::
+	switchime(1)
+return
+
+LShift & Space::
+	switchime(1)
+return
+
+#UseHook off 
+
+switchime(ime := "A")
+{
+	if (ime = 1)
+    {
+		DllCall("SendMessage", UInt, WinActive("A"), UInt, 80, UInt, 1, UInt, DllCall("LoadKeyboardLayout", Str,"00000804", UInt, 1))
+	}
+    else if (ime = 0)
+	{
+		DllCall("SendMessage", UInt, WinActive("A"), UInt, 80, UInt, 1, UInt, DllCall("LoadKeyboardLayout", Str,, UInt, 1))
+	}
+    else if (ime = "A")
+	{
+		Send, ^{Space}
+	}
+}
+return
+
+#n::
+{
+    Run notepads.exe
+}
+
+
 #include CursorMove.ahk
 #include MouseMove.ahk
+#include Quick.ahk
