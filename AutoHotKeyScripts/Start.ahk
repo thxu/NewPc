@@ -88,6 +88,8 @@ Space_Up(){
 
 
 #UseHook
+
+/*
 global LShift_PreKey := ""
 global LShiftPressTimestamp := 0
 
@@ -110,15 +112,15 @@ LShift_Dn(){
     LShift_PreKey := RegExReplace(A_ThisHotkey, "[\$\*\!\^\+\#\s]")
     ; 记录 CapsLock 按住的时间
     if ( LShiftPressTimestamp == 0){
-        LShiftPressTimestamp := A_TickCount
         ;Send, {LShift Down}
+        LShiftPressTimestamp := A_TickCount
     }
     ;showToolTip(LShiftPressTimestamp)
 }
 LShift_Up(){
     if(A_PriorKey == LShift_PreKey){
         span := A_TickCount - LShiftPressTimestamp
-        
+        ;showToolTip(span . "-" . LShiftPressTimestamp)
         if (LShift_PreKey == "LShift" &&  span < 500){
             switchime(0)
         }
@@ -126,16 +128,24 @@ LShift_Up(){
     LShiftPressTimestamp := 0
     Send, {LShift Up}
 }
-
-
-
-
-
-/*
-~LShift::
-	switchime(0)
-return
 */
+
+
+
+
+
+~LShift::
+    LShift_PreKey := RegExReplace(A_ThisHotkey, "[\$\*\!\^\+\#\s\~]")
+    LShiftPressTimestamp := A_TickCount
+    keywait, LShift
+
+    span := A_TickCount - LShiftPressTimestamp
+    ;showToolTip(span)
+	if (A_PriorKey == LShift_PreKey && LShift_PreKey == "LShift" &&  span < 500){
+        switchime(0)
+    }
+return
+
 
 ~RShift::
 	switchime(1)
